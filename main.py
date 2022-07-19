@@ -1,12 +1,16 @@
 import pygame
+import sys
+from node import Spot
+from button import Button
 from algorithms.a_star import a_star
 from algorithms.dijkstra import dijkstra
 from algorithms.DFS import dfs
 
 pygame.init()
+font = pygame.font.Font(pygame.font.get_default_font(), 25)
 
-WIDTH = 700
-ROWS = 70
+WIDTH = 800
+ROWS = 50
 WIN = pygame.display.set_mode((WIDTH, WIDTH))
 font = pygame.font.Font(pygame.font.get_default_font(), 30)
 pygame.display.set_caption("Path Finding Algorithms")
@@ -22,73 +26,6 @@ ORANGE = (255, 165 ,0)
 GREY = (128, 128, 128)
 TURQUOISE = (64, 224, 208)
 BLACK = (0, 0, 0)
-
-class Spot:
-	def __init__(self, row, col, width, total_rows):
-		self.row = row
-		self.col = col
-		self.x = row * width
-		self.y = col * width
-		self.color = WHITE
-		self.neighbors = []
-		self.width = width
-		self.total_rows = total_rows
-
-	def get_pos(self):
-		return self.row, self.col
-
-	def is_closed(self):
-		return self.color == RED
-
-	def is_open(self):
-		return self.color == GREEN
-
-	def is_barrier(self):
-		return self.color == WHITE
-
-	def is_start(self):
-		return self.color == ORANGE
-
-	def is_end(self):
-		return self.color == TURQUOISE
-
-	def reset(self):
-		self.color = BLACK
-
-	def make_start(self):
-		self.color = ORANGE
-
-	def make_closed(self):
-		self.color = RED
-
-	def make_open(self):
-		self.color = GREEN
-
-	def make_barrier(self):
-		self.color = BLACK
-
-	def make_end(self):
-		self.color = TURQUOISE
-
-	def make_path(self):
-		self.color = PURPLE
-
-	def draw(self, win):
-		pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.width))
-
-	def update_neighbors(self, grid):
-		self.neighbors = []
-		if self.row < self.total_rows - 1 and not grid[self.row + 1][self.col].is_barrier(): # DOWN
-			self.neighbors.append(grid[self.row + 1][self.col])
-
-		if self.row > 0 and not grid[self.row - 1][self.col].is_barrier(): # UP
-			self.neighbors.append(grid[self.row - 1][self.col])
-
-		if self.col < self.total_rows - 1 and not grid[self.row][self.col + 1].is_barrier(): # RIGHT
-			self.neighbors.append(grid[self.row][self.col + 1])
-
-		if self.col > 0 and not grid[self.row][self.col - 1].is_barrier(): # LEFT
-			self.neighbors.append(grid[self.row][self.col - 1])
 
 
 def make_grid(rows, width):
@@ -106,12 +43,9 @@ def make_grid(rows, width):
 def draw_grid(win, rows, width):
 	gap = width // rows
 	for i in range(rows):
-		pygame.draw.line(win, BLACK, (0, i * gap), (width, i * gap))
+		pygame.draw.line(win, WHITE, (0, i * gap), (width, i * gap))
 		for j in range(rows):
-			pygame.draw.line(win, BLACK, (j * gap, 0), (j * gap, width))
-
-#def draw_selector(win):
-    #pygame.draw.rect(win, (150, 0, 0), (10, 30, 100, 50))
+			pygame.draw.line(win, WHITE, (j * gap, 0), (j * gap, width))
 
 def draw(win, grid, rows, width):
 	win.fill(WHITE)
@@ -121,7 +55,6 @@ def draw(win, grid, rows, width):
 			spot.draw(win)
 
 	draw_grid(win, rows, width)
-	#draw_selector(win)
 	pygame.display.update()
 
 
@@ -134,8 +67,80 @@ def get_clicked_pos(pos, rows, width):
 
 	return row, col
 
+def main_menu(win):
+	while True:
+		win.fill((80, 140, 255))
 
-def main(win, width, rows):
+		MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+		MENU_TEXT = font.render("MAIN MENU", True, "#ffffff")
+		MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
+
+		PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(WIDTH//2, 250), 
+							text_input="VISUALIZER", font=font, base_color="#ffffff", hovering_color="Red")
+		OPTIONS_BUTTON = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(WIDTH//2, 400), 
+							text_input="CONTROLS", font=font, base_color="#ffffff", hovering_color="Red")
+		QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(WIDTH//2, 550), 
+							text_input="QUIT", font=font, base_color="#ffffff", hovering_color="Red")
+
+		win.blit(MENU_TEXT, MENU_RECT)
+
+		for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+			button.changeColor(MENU_MOUSE_POS)
+			button.update(win)
+		
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				sys.exit()
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+					visualizer(win, WIDTH, ROWS)
+				if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+					controls(win)
+				if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+					pygame.quit()
+					sys.exit()
+
+		pygame.display.update()
+
+def controls(win):
+	pygame.display.set_caption("Menu")
+	while True:
+		win.fill(WHITE)
+		OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+  
+		OPTIONS_TEXT = font.render("These are the controls for the Visualizer:", True, "Black")
+		OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH//2, 60))
+		win.blit(OPTIONS_TEXT, OPTIONS_RECT)
+		OPTIONS_TEXT = font.render("Reset the Grid:	Press C", True, "Black")
+		OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH//2, 310))
+		win.blit(OPTIONS_TEXT, OPTIONS_RECT)
+		OPTIONS_TEXT = font.render("Use the A* Algorithm:	Press A", True, "Black")
+		OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH//2, 360))
+		win.blit(OPTIONS_TEXT, OPTIONS_RECT)
+		OPTIONS_TEXT = font.render("Use the Dijstra Algorithm:	Press D", True, "Black")
+		OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH//2, 410))
+		win.blit(OPTIONS_TEXT, OPTIONS_RECT)
+
+		OPTIONS_BACK = Button(image=None, pos=(WIDTH//2, 650), 
+							text_input="BACK", font=font, base_color="Black", hovering_color="Red")
+
+		OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
+		OPTIONS_BACK.update(win)
+
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				pygame.quit()
+				sys.exit()
+			if event.type == pygame.MOUSEBUTTONDOWN:
+				if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+					main_menu(win)
+
+		pygame.display.update()
+
+
+def visualizer(win, width, rows):
 	grid = make_grid(rows, width)
 
 	start = None
@@ -174,12 +179,19 @@ def main(win, width, rows):
 					end = None
 
 			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_SPACE and start and end:
+				if event.key == pygame.K_a and start and end:
 					for row in grid:
 						for spot in row:
 							spot.update_neighbors(grid)
 
 					a_star(lambda: draw(win, grid, rows, width), grid, start, end)
+	 
+				if event.key == pygame.K_d and start and end:
+					for row in grid:
+						for spot in row:
+							spot.update_neighbors(grid)
+
+					dijkstra(lambda: draw(win, grid, rows, width), grid, start, end)
    
 				if event.key == pygame.K_c:
 					start = None
@@ -189,4 +201,5 @@ def main(win, width, rows):
 	pygame.quit()
 
 if __name__ == '__main__':
-	main(WIN, WIDTH, ROWS)
+	#main(WIN, WIDTH, ROWS)
+	main_menu(WIN)
