@@ -30,13 +30,13 @@ Clone the project
 
 Go to the project directory
 
-```bash
+```python
   cd Pathfinding-Visualizer
 ```
 
 Install the dependencies
 
-```pip
+```python
   pip install -r requirements.txt
 ```
 
