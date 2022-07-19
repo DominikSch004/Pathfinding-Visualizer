@@ -1,6 +1,6 @@
 # Pathfinding Visualizer
 
-## A Pathfinding Visualizer, which allows the user to create a custom Maze and visulaize different Algorithms to solve the Maze and find the End Node. 
+## A Pathfinding Visualizer, which allows the user to create a custom Maze and visualize different Algorithms to solve the Maze and find the End Node. 
 
 ## Features
 
