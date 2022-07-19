@@ -4,7 +4,8 @@ from node import Spot
 from button import Button
 from algorithms.a_star import a_star
 from algorithms.dijkstra import dijkstra
-from algorithms.DFS import dfs
+from algorithms.depth_first_search import dfs
+from algorithms.breadth_first_search import bfs
 
 pygame.init()
 font = pygame.font.Font(pygame.font.get_default_font(), 25)
@@ -122,6 +123,12 @@ def controls(win):
 		OPTIONS_TEXT = font.render("Use the Dijstra Algorithm:	Press D", True, "Black")
 		OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH//2, 410))
 		win.blit(OPTIONS_TEXT, OPTIONS_RECT)
+		OPTIONS_TEXT = font.render("Use the Breath First Search Algorithm:	Press B", True, "Black")
+		OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH//2, 410))
+		win.blit(OPTIONS_TEXT, OPTIONS_RECT)
+		OPTIONS_TEXT = font.render("Use the Depth First Search Algorithm:	Press S", True, "Black")
+		OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(WIDTH//2, 410))
+		win.blit(OPTIONS_TEXT, OPTIONS_RECT)
 
 		OPTIONS_BACK = Button(image=None, pos=(WIDTH//2, 650), 
 							text_input="BACK", font=font, base_color="Black", hovering_color="Red")
@@ -184,7 +191,7 @@ def visualizer(win, width, rows):
 						for spot in row:
 							spot.update_neighbors(grid)
 
-					a_star(lambda: draw(win, grid, rows, width), grid, start, end)
+					dfs(lambda: draw(win, grid, rows, width), grid, start, end)
 	 
 				if event.key == pygame.K_d and start and end:
 					for row in grid:
@@ -192,6 +199,20 @@ def visualizer(win, width, rows):
 							spot.update_neighbors(grid)
 
 					dijkstra(lambda: draw(win, grid, rows, width), grid, start, end)
+	 
+				if event.key == pygame.K_s and start and end:
+					for row in grid:
+						for spot in row:
+							spot.update_neighbors(grid)
+
+					dfs(lambda: draw(win, grid, rows, width), grid, start, end)
+	 
+				if event.key == pygame.K_b and start and end:
+					for row in grid:
+						for spot in row:
+							spot.update_neighbors(grid)
+
+					bfs(lambda: draw(win, grid, rows, width), grid, start, end)
    
 				if event.key == pygame.K_c:
 					start = None
@@ -201,5 +222,4 @@ def visualizer(win, width, rows):
 	pygame.quit()
 
 if __name__ == '__main__':
-	#main(WIN, WIDTH, ROWS)
 	main_menu(WIN)

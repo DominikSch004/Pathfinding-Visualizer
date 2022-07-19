@@ -4,10 +4,9 @@
 
 ## Features
 
-- 5 different Pathfinding Algorithms to choose from:
+- 4 different Pathfinding Algorithms to choose from:
     - A* Search
     - Dijkstras Algorithm
-    - Greedy Best First Search
     - Breadth First Search
     - Depth First Search
 - Easy to use PyGame Menu and UI
